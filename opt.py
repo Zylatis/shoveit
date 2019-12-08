@@ -2,6 +2,7 @@ import math
 import numpy as np 
 import copy
 import time
+import random
 import matplotlib.pyplot as plt
 from numba import jit, prange
 # http://hjemmesider.diku.dk/~pisinger/codes.html
@@ -143,14 +144,15 @@ item_list = [
 	[1,1],
 	[7,5],
 	[7,5],
-	# [15,5],
 	[2,1],
 	[5,5],
 	[1,4],
 	[1,1],
-	[1,1]
+	[1,1],
+	[5,5]
 
 	]
+random.shuffle(item_list)
 areas = [-x*y for x,y in item_list]
 # heuristic_order = range(len(areas))
 heuristic_order = np.argsort(areas)
