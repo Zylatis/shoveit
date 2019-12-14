@@ -97,23 +97,23 @@ def add_item(grid, item_size, all_coords, labelled_grid):
 		x,y = coord
 
 		# try original orientation
-		if (test_grid[x:x+l,y:y+w].all() == 1.) and (x+l < box_l) and (y+w < box_w):
+		if (test_grid[x:x+l,y:y+w].all() == 1.) and (x+l <= box_l) and (y+w <= box_w):
 			test_grid[x:x+l,y:y+w] = 0
-			max_free_area = largestRectangle(test_grid) + 1./calc_perimiter(test_grid)
+			max_free_area = largestRectangle(test_grid) + 1./(calc_perimiter(test_grid)+0.01)
 			test_grid[x:x+l,y:y+w] = 1
 			if (max_free_area > overall_max_free_area):
 				overall_max_free_area = max_free_area
 				placement = coord
 
 		# try rotated object
-		# if (test_grid[x:x+w,y:y+l].all() == 1.) and (x+w < box_l) and (y+l < box_w):
-		# 	test_grid[x:x+w,y:y+l] = 0
-		# 	max_free_area = largestRectangle(test_grid) + 1./calc_perimiter(test_grid)
-		# 	test_grid[x:x+w,y:y+l] = 1
-		# 	if (max_free_area > overall_max_free_area):
-		# 		overall_max_free_area = max_free_area
-		# 		placement = coord
-		# 		w,l = l, w
+		if (test_grid[x:x+w,y:y+l].all() == 1.) and (x+w <= box_l) and (y+l <= box_w):
+			test_grid[x:x+w,y:y+l] = 0
+			max_free_area = largestRectangle(test_grid) + 1./(calc_perimiter(test_grid)+0.01)
+			test_grid[x:x+w,y:y+l] = 1
+			if (max_free_area > overall_max_free_area):
+				overall_max_free_area = max_free_area
+				placement = coord
+				w,l = l, w
 
 	if (placement == np.array([-1,-1])).all():
 		print("Failed to place item")
@@ -132,8 +132,8 @@ def gen_item_list(n, x_range, y_range):
 
 	return items
 
-n = 20
-m = 20
+n = 14
+m = 14
 grid = np.zeros((n,m))
 grid.fill(1)
 
@@ -148,8 +148,9 @@ all_coords = set(all_coords)
 labelled_grid = copy.copy(1.-grid)
 st = time.time()
 
+# Perfect fit (with rotation) scenario for 14x14
 random.seed(0)
-item_list = gen_item_list(30,[1,5],[1,5])
+item_list = gen_item_list(29,[1,5],[1,5])+ [[2,2]]
 
 areas = [-x*y for x,y in item_list]
 heuristic_order = np.argsort(areas)
