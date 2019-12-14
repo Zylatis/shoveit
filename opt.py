@@ -46,12 +46,12 @@ def largestRectangle(M):
 
 	return max_area
 
+@jit(nopython=True)
 def calc_perimiter(grid):
 	box_l, box_w = grid.shape
 	p = 0
 	for i in range(box_l):
 		for j in range(box_w):
-			bools = []
 			if grid[i,j] == 0:
 				if i>0:
 					if grid[i-1,j] == 1:
@@ -66,6 +66,7 @@ def calc_perimiter(grid):
 					if grid[i,j+1] == 1:
 						p+=1
 	return p
+
 # @jit
 def add_item(grid, item_size, all_coords, labelled_grid):
 	# Lots of optimisations can be done here in terms of checking against existing placements,
@@ -92,20 +93,27 @@ def add_item(grid, item_size, all_coords, labelled_grid):
 	placement = np.array([-1,-1])
 
 	for coord in available:
+		
 		x,y = coord
 
+		# try original orientation
 		if (test_grid[x:x+l,y:y+w].all() == 1.) and (x+l < box_l) and (y+w < box_w):
-
 			test_grid[x:x+l,y:y+w] = 0
-			max_free_area = largestRectangle(test_grid) + 1./calc_perimiter(test_grid)# + largestRectangle(1.-test_grid)
-			# perim = calc_perimiter(test_grid)
+			max_free_area = largestRectangle(test_grid) + 1./calc_perimiter(test_grid)
 			test_grid[x:x+l,y:y+w] = 1
-			# print(perim)
-			if (max_free_area > overall_max_free_area) :#and (perim <= overall_perimiter):
-			# if perim <= overall_perimiter:
+			if (max_free_area > overall_max_free_area):
 				overall_max_free_area = max_free_area
-				# overall_perimiter = perim
 				placement = coord
+
+		# try rotated object
+		# if (test_grid[x:x+w,y:y+l].all() == 1.) and (x+w < box_l) and (y+l < box_w):
+		# 	test_grid[x:x+w,y:y+l] = 0
+		# 	max_free_area = largestRectangle(test_grid) + 1./calc_perimiter(test_grid)
+		# 	test_grid[x:x+w,y:y+l] = 1
+		# 	if (max_free_area > overall_max_free_area):
+		# 		overall_max_free_area = max_free_area
+		# 		placement = coord
+		# 		w,l = l, w
 
 	if (placement == np.array([-1,-1])).all():
 		print("Failed to place item")
@@ -114,6 +122,15 @@ def add_item(grid, item_size, all_coords, labelled_grid):
 		x,y = placement
 		grid[x:x+l,y:y+w] = 0
 		labelled_grid[x:x+l,y:y+w] = np.max(labelled_grid)+1.
+
+def gen_item_list(n, x_range, y_range):
+	items = []
+	for i in range(n):
+		x = random.randrange(x_range[0],x_range[1])
+		y = random.randrange(y_range[0],y_range[1])
+		items.append([x,y])
+
+	return items
 
 n = 20
 m = 20
@@ -131,51 +148,18 @@ all_coords = set(all_coords)
 labelled_grid = copy.copy(1.-grid)
 st = time.time()
 
-item_list = [
-	[2,2],
-	[10,5],
-	[2,2],
-	[5,2],
-	[5,2],
-	[12,3],
-	[3,3],
-	[3,2],
-	[3,2],
-	[1,1],
-	[7,5],
-	[7,5],
-	[2,1],
-	[5,5],
-	[1,4],
-	[1,1],
-	[1,1],
-	[5,5]
+random.seed(0)
+item_list = gen_item_list(30,[1,5],[1,5])
 
-	]
-random.shuffle(item_list)
 areas = [-x*y for x,y in item_list]
-# heuristic_order = range(len(areas))
 heuristic_order = np.argsort(areas)
+c = 0
 for i in heuristic_order:
 	item = item_list[i]
 	add_item(grid,item,all_coords, labelled_grid)
+	plt.imshow(labelled_grid, cmap='hot', interpolation='nearest')
+	plt.savefig(f'imgs/{c}.png')
+	c+=1
 
 d = time.time()-st
 print(d)
-# print(labelled_grid)
-print(d*math.factorial(len(item_list))/60)
-plt.imshow(labelled_grid, cmap='hot', interpolation='nearest')
-plt.savefig('test.png')
-
-# print(calc_perimiter(labelled_grid))
-# grid = np.zeros((n,m))
-# print(grid)
-# print(calc_perimiter(grid))
-# grid[0:2,7:9]=0
-# print(calc_perimiter(grid))
-# print(grid)
-
-# grid[0:2,7:9]=1
-# grid[2:4,0:2]=0
-# print(calc_perimiter(grid))
-# print(grid)
