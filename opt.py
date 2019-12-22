@@ -92,6 +92,7 @@ def add_item(grid, item_size, all_coords, labelled_grid):
 	overall_perimiter = pow(10,10)
 	placement = np.array([-1,-1])
 
+	# This could be parallelized, with a bit of work
 	for coord in available:
 		
 		x,y = coord
@@ -132,12 +133,13 @@ def gen_item_list(n, x_range, y_range):
 
 	return items
 
+st = time.time()
+
 n = 14
 m = 14
 grid = np.zeros((n,m))
 grid.fill(1)
 
-st = time.time()
 free_area = largestRectangle(grid)
 
 all_coords = []
