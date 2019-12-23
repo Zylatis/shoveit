@@ -1,8 +1,12 @@
-# shoveit: 2D packing optimiser
+# shoveit: container packing optimiser
+This code is just the start of an experiment with packing algorithms. 
 
-This code is just the start of an experiment with packing algorithms. Currently the functionality is extremly limited, and it is slow. The reason for this is:
+![Example](example.gif)
 
-##Algorithm
+
+Currently the functionality is extremly limited, and it is slow. The reason for this is:
+
+## Algorithm
 Currently this only does a very stupid brute force approach with a few heuristics tacked on the make it even vaguely tractable, but there is method to this madness (see later in doc):
 
 * Order all input items by their area, so that the largest is placed first.
